@@ -1,0 +1,18 @@
+@using SentinelAML.Application.DTOs
+@if (Cards != null) {
+<div class="row g-3 mb-4">
+    @foreach (var card in Cards) {
+    <div class="col-md-@CssColNumber">
+        <CardSmall Title=@card.Title Value=@card.Value Color=@card.Color />
+    </div>
+    }
+</div>
+}
+
+@code {
+    [Parameter]
+    public required List<CardSmallDto>? Cards { get; set; }
+
+    [Parameter]
+    public required string CssColNumber { get; set; }
+}

@@ -1,0 +1,37 @@
+<div class="btn-group dropdown @ClassName">
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createTicketModal" @onclick="MainAction">
+        <i class="bi @Icon"></i> @Title
+    </button>
+    <button class="btn btn-outline-success dropdown-toggle dropdown-toggle-split @(isActive ? "show" : "")"
+            data-bs-toggle="dropdown" @onclick="ToggleDropdown" @onblur="HideDropdown">
+        <span class="visually-hidden">More actions</span>
+    </button>
+                
+    <ul class="dropdown-menu dropdown-menu-end @(isActive ? "show" : "")">
+        @Items
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public required string ClassName { get; set;}
+    [Parameter]
+    public required string Icon { get; set;}
+    [Parameter]
+    public required string Title { get; set;}
+    [Parameter]
+    public required Action MainAction { get; set; }
+    [Parameter] 
+    public required RenderFragment Items { get; set;}
+    
+    private bool isActive;
+
+    private void ToggleDropdown () => isActive = !isActive;
+    private void HideDropdown() {
+        Task.Delay(100).ContinueWith(_ => {
+            if (!isActive) return;
+            isActive = false;
+            InvokeAsync(StateHasChanged); 
+        });
+    }
+}

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/SentinelAML.Application/SentinelAML.Application.csproj" />
+  <Project Path="src/SentinelAML.Domain/SentinelAML.Domain.csproj" />
+  <Project Path="src/SentinelAML.Infrastructure/SentinelAML.Infrastructure.csproj" />
+  <Project Path="src/SentinelAML.Web/SentinelAML.Web.csproj" />
+</Solution>

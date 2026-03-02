@@ -1,0 +1,246 @@
+﻿@page "/alert"
+@using System.Globalization
+@using SentinelAML.Application.DTOs
+@using SentinelAML.Application.Risk
+@using SentinelAML.Application.Services
+@using SentinelAML.Domain.Enums
+@using SentinelAML.Web.Components.Elements
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@inject AlertService AlertService;
+
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2 class="fw-bold mb-1">Alert Management</h2>
+        <p class="text-muted">Review and manage AML alerts</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <button class="btn btn-outline-secondary me-2">
+            <i class="bi bi-download"></i> Export CSV
+        </button>
+        @* <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bulkActionsModal"> *@
+        @*     <i class="bi bi-layers"></i> Bulk Actions *@
+        @* </button> *@
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<CardSmallWrap Cards="@Cards" CssColNumber="3"/>
+    
+<div class="row">
+    <div class="col-12">
+
+        <!-- Filter -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-lg-3">
+                        <label class="form-label small fw-semibold">Search</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control border-start-0" placeholder="Customer ID or Name"
+                                   id="searchInput" @bind="filter.Name">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2">
+                        <label class="form-label small fw-semibold">Risk Score</label>
+                        <select class="form-select" id="riskFilter" @bind="filter.RiscScore">
+                            <option value="">All Levels</option>
+                            <option value="high">High (≥ 70)</option>
+                            <option value="medium">Medium (40-69)</option>
+                            <option value="low">Low (&lt; 40)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2">
+                        <label class="form-label small fw-semibold">Status</label>
+                        <select class="form-select" id="statusFilter" @bind="filter.Status">
+                            <option value="">All Statuses</option>
+                            <option value="open">Open</option>
+                            <option value="in_review">In Review</option>
+                            <option value="closed">Closed</option>
+                            <option value="false_positive">False Positive</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <label class="form-label small fw-semibold">Date Range</label>
+                        <select class="form-select" id="dateFilter" @bind="filter.Date">
+                            <option value="">All Days</option>
+                            <option value="0">Today</option>
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="120">Last 120 days</option>
+                        </select>
+                    </div>
+
+
+                    <div class="col-lg-2 d-flex align-items-end">
+                        <button class="btn btn-primary w-100 me-2" id="applyFilters" @onclick="FilterAction"><i
+                                class="bi bi-funnel"></i>Apply
+                        </button>
+                        <button class="btn btn-outline-secondary" id="clearFilters" @onclick="FilterClean"><i
+                                class="bi bi-x"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Alert ID</th>
+                            <th>Customer</th>
+                            <th>Transaction</th>
+                            <th>Risk Score</th>
+                            <th>Rules Triggered</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if (alertsList != null) {
+                            @foreach (var alert2 in alertsList) {
+                                <tr class="@(alert2.Status.ToString().Equals("Closed") ? "table-secondary opacity-50" : "")">
+                                    <td><code>ALT-@alert2.Id</code></td>
+                                    <td>
+                                        <div class="fw-semibold">@alert2.Customer?.Name</div>
+                                        <div class="text-muted">CST-@alert2.Customer?.Id</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">@AmountFormat(alert2)</div>
+                                        <div class="text-muted">TXN-@alert2.Transaction?.Id.ToString()</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-@GetRiskScore(alert2.RiskScore)">@alert2.RiskScore</span>
+                                    </td>
+                                    <td>
+                                        @if (alert2.Rules.Count > 0) {
+                                            @foreach (var rule in alert2.Rules.Select(GetRule).OfType<RuleDictionary>()) {
+                                                <span class="badge bg-@rule.Color bg-opacity-10 text-@rule.Color me-1">@rule.Name</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-@GetStatus(alert2.Status)">@alert2.Status</span>
+                                    </td>
+                                    <td class="text-muted small">
+                                        <div>@alert2.CreatedAt.TimeOfDay.ToString(@"hh\:mm\:ss")</div>
+                                        <div>@alert2.CreatedAt.Date.ToString("dd-MM-yyyy")</div>
+                                    </td>
+                                    <td>
+                                        <a href="/alert/@alert2.Id" type="button"
+                                           class="btn btn-sm btn-outline-@(alert2.Status.ToString().Equals("Closed") ? "secondary" : "primary") w-75">
+                                            @(alert2.Status.ToString().Equals("Closed") ? "View" : "Review")
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card-footer bg-white border-0">
+                <div class="row align-items-center">
+                    <Pagination
+                        LoadData="LoadData"
+                        PageInit="pageInit"
+                        CurrentPage="currentPage"
+                        PageSize="pageSize" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<AlertDto>? alertsList;
+    private PageInit? pageInit;
+    private int currentPage = 1;
+    private int pageSize = 5;
+    private readonly AlertViewFilter filter = new();
+    private List<CardSmallDto> Cards = [];
+
+    protected override async Task OnInitializedAsync() {
+        InitCards();
+        await LoadData();
+    }
+
+    private async Task LoadData(PaginationRequest? request = null) {
+        if (request != null) {
+            currentPage = request.CurrentPage;
+            pageSize = request.PageSize;
+        }
+
+        (alertsList, pageInit, var statusMap) = await AlertService.GetAlertsFilterPaginated(
+            filter, 
+            currentPage, 
+            pageSize
+        );
+        
+        foreach (var card in Cards) {
+            card.Value =  statusMap.TryGetValue(card.Status, out var value) ? value.ToString() : "0";
+        }
+    }
+    
+    private async Task FilterAction() {
+        currentPage = 1;
+        await LoadData();
+    }
+
+    private async Task FilterClean() {
+        currentPage = 1;
+        filter.Clean();
+        await LoadData();
+    }
+
+    /**
+     * formatting
+     */
+    private void InitCards() {
+        Cards = [
+            new CardSmallDto("OPEN ALERTS", "0", "warning", AlertStatus.Open), 
+            new CardSmallDto("IN REVIEW", "0", "primary", AlertStatus.InReview), 
+            new CardSmallDto("CLOSED", "0", "success", AlertStatus.Closed), 
+            new CardSmallDto("FALSE POSITIVE", "0", "secondary", AlertStatus.FalsePositive)
+        ];
+    }
+    
+    private static RuleDictionary? GetRule(string ruleName) 
+        => RuleDictionary.FromName(ruleName);
+
+    private static string GetRiskScore(int riskScore) {
+        return riskScore switch {
+            >= 80 and < 90 => "warning",
+            >= 90 => "danger",
+            _ => "success"
+        };
+    }
+
+    private static string GetStatus(AlertStatus status) {
+        return status.ToString() switch {
+            "Open" => "warning",
+            "InReview" => "primary",
+            "Closed" => "secondary",
+            "FalsePositive" => "info",
+            _ => ""
+        };
+    }
+
+    private static string AmountFormat(AlertDto alertDto) {
+        if (alertDto.Transaction?.Amount == null) return "";
+
+        var result =  alertDto.Transaction.Amount.ToString("N2", CultureInfo.InvariantCulture)
+            .Replace(',', ' ')
+            .Replace(',', '.');
+        return $"${result}";
+    }
+
+}

@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+.idea/
+*.user
+*.suo
+*.DotSettings.user
+appsettings.Development.json
+docs

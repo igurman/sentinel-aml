@@ -1,0 +1,15 @@
+<div class="card border-0 border-start border-@Color border-4 shadow-sm">
+    <div class="card-body">
+        <h6 class="text-muted small mb-1">@Title</h6>
+        <h4 class="fw-bold mb-0">@Value</h4>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public required string Title { get; set; }
+    [Parameter]
+    public required string Value { get; set; }
+    [Parameter]
+    public required string Color { get; set; }
+}

@@ -1,0 +1,94 @@
+@using SentinelAML.Application.DTOs
+@if (PageInit != null) {
+    <div class="col-md-6">
+        <div class="float-start">
+            <span
+                class="text-muted small mb-0">Showing @(CurrentPage * PageSize - PageSize + 1) - @(CurrentPage * PageSize) of @PageInit.TotalItems alerts</span>
+            <div class="d-inline-block mx-2">
+                <select @onchange="ChangePageSize" class="form-select form-select-sm">
+                    @foreach (var size in pageSizeList) {
+                        <option value="@size">@size</option>
+                    }
+                </select>
+            </div>
+            <span class="text-muted small mb-0">rows per page</span>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <nav>
+            <ul class="pagination pagination-sm justify-content-end mb-0">
+                <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                    <button class="page-link" @onclick="PrevPage">Previous</button>
+                </li>
+                @if (PageInit?.TotalPages > 0) {
+                    <li class="page-item @(CurrentPage == 1 ? "active" : "")">
+                        <button class="page-link" @onclick="() => GoToPage(1)">1</button>
+                    </li>
+                }
+                @if (PageInit?.TotalPages > 2) {
+                    @foreach (var pageNumber in Enumerable.Range(GetRangeStart(), 5)) {
+                        <li class="page-item @(CurrentPage == pageNumber ? "active" : "")">
+                            <button class="page-link"
+                                    @onclick="() => GoToPage(pageNumber)">@pageNumber</button>
+                        </li>
+                    }
+                }
+                @if (PageInit?.TotalPages > 1) {
+                    <li class="page-item @(CurrentPage == PageInit?.TotalPages ? "active" : "")">
+                        <button class="page-link" @onclick="() => GoToPage(PageInit!.TotalPages)">@PageInit?.TotalPages</button>
+                    </li>
+                }
+                <li class="page-item @(CurrentPage == PageInit!.TotalPages ? "disabled" : "")">
+                    <button class="page-link" @onclick="NextPage">Next</button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}
+
+@code {
+    private readonly int[] pageSizeList = [5, 10, 20, 50];
+    [Parameter] public EventCallback<PaginationRequest> LoadData { get; set; }
+    [Parameter] public PageInit? PageInit { get; set; }
+    [Parameter] public int CurrentPage { get; set; }
+    [Parameter] public int PageSize { get; set; }
+
+    private int GetRangeStart() {
+        var result = 2;
+        if (PageInit?.TotalPages == null) return result;
+        
+        var firstDiff = CurrentPage - 2;
+        result = (firstDiff <= 2)
+        ? result
+        : firstDiff;
+        
+        var lastDiff = PageInit.TotalPages - CurrentPage;
+        result = (lastDiff <= 3) 
+            ? PageInit.TotalPages - 5 
+            : result;
+        
+        return result;
+    }
+    
+    private async Task NextPage() {
+        if (PageInit != null && CurrentPage < PageInit.TotalPages) {
+            await LoadData.InvokeAsync(new PaginationRequest(CurrentPage += 1, PageSize));
+        }
+    }
+
+    private async Task PrevPage() {
+        if (CurrentPage > 1) {
+            await LoadData.InvokeAsync(new PaginationRequest(CurrentPage -= 1, PageSize));
+        }
+    }
+
+    private async Task ChangePageSize(ChangeEventArgs e) {
+        var size = int.Parse(e.Value!.ToString()!);
+        await LoadData.InvokeAsync(new PaginationRequest(1, size));
+    }
+
+    private async Task GoToPage(int pageNumber) {
+        CurrentPage = pageNumber;
+        await LoadData.InvokeAsync(new PaginationRequest(pageNumber, PageSize));
+    }
+}

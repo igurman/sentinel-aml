@@ -1,0 +1,19 @@
+@using SentinelAML.Application.Services
+@using SentinelAML.Domain.Entities
+@inject TransactionService TransactionService;
+
+<h3>TransactionTable</h3>
+@if (_transactions != null) {
+    @foreach (var transaction in _transactions) {
+        <p>@transaction.ToString()</p>
+    }
+}
+
+@code {
+    List<Transaction>? _transactions;
+
+    protected override async Task OnInitializedAsync() {
+        _transactions = await TransactionService.GetTransactionsAsync();
+    }
+
+}
