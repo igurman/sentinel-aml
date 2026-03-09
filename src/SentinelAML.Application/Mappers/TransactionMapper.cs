@@ -1,10 +1,9 @@
 using SentinelAML.Application.DTOs;
 using SentinelAML.Domain.Entities;
-using SentinelAML.Domain.Interfaces;
 
 namespace SentinelAML.Application.Mappers;
 
-public class TransactionMapper (IDictionaryProvider _dictionary, CustomerMapper customerMapper) {
+public class TransactionMapper (/*IDictionaryProvider _dictionary,*/ CustomerMapper customerMapper) {
 
     public TransactionDto? Map(Transaction? transaction) {
         if (transaction == null)

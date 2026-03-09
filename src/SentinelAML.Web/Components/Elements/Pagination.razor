@@ -26,7 +26,7 @@
                     </li>
                 }
                 @if (PageInit?.TotalPages > 2) {
-                    @foreach (var pageNumber in Enumerable.Range(GetRangeStart(), 5)) {
+                    @foreach (var pageNumber in Enumerable.Range(GetRangeStart(), PageInit?.TotalPages > 5 ? 5 : PageInit!.TotalPages - 2 )) {
                         <li class="page-item @(CurrentPage == pageNumber ? "active" : "")">
                             <button class="page-link"
                                     @onclick="() => GoToPage(pageNumber)">@pageNumber</button>
@@ -64,7 +64,9 @@
         
         var lastDiff = PageInit.TotalPages - CurrentPage;
         result = (lastDiff <= 3) 
-            ? PageInit.TotalPages - 5 
+            ? PageInit.TotalPages <= 3 
+                ? 2 
+                : PageInit.TotalPages - 5 
             : result;
         
         return result;

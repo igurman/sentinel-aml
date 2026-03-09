@@ -12,6 +12,7 @@ public static class Extensions {
         serviceCollection.AddScoped<TicketMapper>();
         serviceCollection.AddScoped<TransactionMapper>();
         serviceCollection.AddScoped<AlertService>();
+        serviceCollection.AddScoped<TicketService>();
         return serviceCollection;
     }
 }

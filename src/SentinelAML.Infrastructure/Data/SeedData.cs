@@ -1,4 +1,5 @@
 using SentinelAML.Application.Risk;
+using SentinelAML.Domain.Constants;
 using SentinelAML.Domain.Entities;
 using SentinelAML.Domain.Enums;
 
@@ -87,6 +88,7 @@ public static class SeedData {
                 alert.Id,
                 Names[Random.Next(0, AssignedNames.Count - 1)],
                 GetRandomEnumValue<TicketStatus>(),
+                GetRandomEnumValue<TicketPriorityType>(),
                 "try to understand this ticket",
                 DateTimeOffset.Now)
         ).ToList();

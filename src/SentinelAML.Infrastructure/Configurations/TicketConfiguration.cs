@@ -17,6 +17,9 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket> {
         builder.Property(x => x.Status)
             .HasConversion<string>();
         
+        builder.Property(x => x.Priority)
+            .HasConversion<string>();
+        
         builder.Property(x => x.Decision)
             .HasConversion<string>();
 

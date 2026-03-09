@@ -3,7 +3,6 @@ using SentinelAML.Application.DTOs;
 using SentinelAML.Application.Interfaces;
 using SentinelAML.Application.Mappers;
 using SentinelAML.Domain.Entities;
-using SentinelAML.Domain.Enums;
 
 namespace SentinelAML.Application.Services;
 
@@ -20,7 +19,7 @@ public class AlertService(IAlertRepository repository, AlertMapper alertMapper) 
         return (items, total);
     }
     
-    public async Task<(List<AlertDto> Items, PageInit pageInit, Dictionary<AlertStatus, int> statusMap)> 
+    public async Task<(List<AlertDto> Items, PageInit pageInit, Dictionary<string, int> statusMap)> 
         GetAlertsFilterPaginated(AlertViewFilter filter, int page, int pageSize)
     {
         var query = repository.GetAlertsQuery(filter);
@@ -31,7 +30,7 @@ public class AlertService(IAlertRepository repository, AlertMapper alertMapper) 
             .GroupBy(a => a.Status)
             .Select(g => new 
             { 
-                Status = g.Key, 
+                Status = g.Key.ToString(), 
                 Count = g.Count() 
             })
             .ToDictionaryAsync(x => x.Status, x => x.Count);

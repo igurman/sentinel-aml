@@ -166,7 +166,7 @@
     private int currentPage = 1;
     private int pageSize = 5;
     private readonly AlertViewFilter filter = new();
-    private List<CardSmallDto> Cards = [];
+    private List<CardDto> Cards = [];
 
     protected override async Task OnInitializedAsync() {
         InitCards();
@@ -186,7 +186,9 @@
         );
         
         foreach (var card in Cards) {
-            card.Value =  statusMap.TryGetValue(card.Status, out var value) ? value.ToString() : "0";
+            if (card.Status != null) {
+                card.Value =  statusMap.TryGetValue(card.Status, out var value) ? value.ToString() : "0";
+            }
         }
     }
     
@@ -206,10 +208,26 @@
      */
     private void InitCards() {
         Cards = [
-            new CardSmallDto("OPEN ALERTS", "0", "warning", AlertStatus.Open), 
-            new CardSmallDto("IN REVIEW", "0", "primary", AlertStatus.InReview), 
-            new CardSmallDto("CLOSED", "0", "success", AlertStatus.Closed), 
-            new CardSmallDto("FALSE POSITIVE", "0", "secondary", AlertStatus.FalsePositive)
+            CardDto.builder()
+                .Title("OPEN ALERTS")
+                .Color("warning")
+                .Status(nameof(AlertStatus.Open))
+                .Build(),
+            CardDto.builder()
+                .Title("IN REVIEW")
+                .Color("primary")
+                .Status(nameof(AlertStatus.InReview))
+                .Build(),
+            CardDto.builder()
+                .Title("CLOSED")
+                .Color("success")
+                .Status(nameof(AlertStatus.Closed))
+                .Build(),
+            CardDto.builder()
+                .Title("FALSE POSITIVE")
+                .Color("secondary")
+                .Status(nameof(AlertStatus.FalsePositive))
+                .Build()
         ];
     }
     

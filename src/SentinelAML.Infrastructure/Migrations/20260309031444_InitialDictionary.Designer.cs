@@ -12,8 +12,8 @@ using SentinelAML.Infrastructure.Data;
 namespace SentinelAML.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260228025125_DictionaryData")]
-    partial class DictionaryData
+    [Migration("20260309031444_InitialDictionary")]
+    partial class InitialDictionary
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -165,6 +165,10 @@ namespace SentinelAML.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Decision")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Priority")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

@@ -1,4 +1,4 @@
-namespace SentinelAML.Domain.Enums;
+namespace SentinelAML.Domain.Constants;
 
 public enum TicketStatus {
     Open, 

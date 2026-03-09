@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SentinelAML.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialSchems : Migration
+    public partial class InitialDictionary : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -119,6 +119,7 @@ namespace SentinelAML.Infrastructure.Migrations
                     AlertId = table.Column<long>(type: "bigint", nullable: false),
                     AssignedTo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Priority = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Decision = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
