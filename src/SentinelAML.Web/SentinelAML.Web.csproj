@@ -24,12 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="wwwroot\bootstrap\bootstrap.min.css.map">
-        <DependentUpon>bootstrap.css</DependentUpon>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <_ContentIncludedByDefault Remove="Components\Pages\chat\TicketDetails.razor" />
       <_ContentIncludedByDefault Remove="Components\Pages\chat\Tickets.razor" />
       <_ContentIncludedByDefault Remove="Components\Pages\chat\Dashboard.razor" />
