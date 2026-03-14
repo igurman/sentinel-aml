@@ -10,5 +10,5 @@ Provides a convenient dashboard for managing tasks. It automatically logs transa
 - EF Core
 - MS SQL Server
 
-![img.png](img.png)
+<img src="readmeDoc/tickets.png">
 
